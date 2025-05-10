@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+    }
+    ul {
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>To-Do List</h2>
+  <input type="text" id="todoInput" placeholder="Enter new todo">
+  <button id="addBtn">Add Todo</button>
+
+  <ul id="todoList"></ul>
+
+  <script>
+    // Select DOM elements
+    const input = document.getElementById('todoInput');
+    const button = document.getElementById('addBtn');
+    const list = document.getElementById('todoList');
+
+    // Load saved todos from cookies on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      const savedTodos = getCookie('todos');
+      if (savedTodos) {
+        const todos = JSON.parse(savedTodos);
+        todos.forEach(todo => addTodoToDOM(todo));
+      }
+    });
+
+    // Add click event listener to the button
+    button.addEventListener('click', () => {
+      const todoText = input.value.trim();
+      if (todoText) {
+        addTodoToDOM(todoText);
+        saveTodoToCookies(todoText);
+        input.value = ''; // Clear input
+      }
+    });
+
+    // Function to add a new todo item to the list in DOM
+    function addTodoToDOM(todoText) {
+      const li = document.createElement('li');
+      li.textContent = todoText;
+      list.appendChild(li);
+    }
+
+    // Function to save new todo item to cookies
+    function saveTodoToCookies(todoText) {
+      let todos = getCookie('todos');
+      todos = todos ? JSON.parse(todos) : [];
+      todos.push(todoText);
+      document.cookie = `todos=${JSON.stringify(todos)}; path=/; max-age=31536000`; // 1 year
+    }
+
+    // Function to get a cookie value by name
+    function getCookie(name) {
+      const cookieArr = document.cookie.split(';');
+      for (let i = 0; i < cookieArr.length; i++) {
+        const cookiePair = cookieArr[i].trim().split('=');
+        if (cookiePair[0] === name) {
+          return decodeURIComponent(cookiePair[1]);
+        }
+      }
+      return null;
+    }
+  </script>
+
+</body>
+</html>
